@@ -654,6 +654,10 @@ struct page *swap_cluster_readahead(swp_entry_t entry, gfp_t gfp_mask,
 	mask = swapin_nr_pages(offset) - 1;
 	if (!mask)
 		goto skip;
+	
+	/* If exiting, don't do swap readahead. */
+	if (current->flags & PF_EXITING)
+		goto skip;
 
 	/* If exiting, don't do swap readahead. */
 	if (current->flags & PF_EXITING)
