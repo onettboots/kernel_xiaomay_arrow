@@ -1904,15 +1904,13 @@ shrink_inactive_list(unsigned long nr_to_scan, struct lruvec *lruvec,
 	int file = is_file_lru(lru);
 	struct pglist_data *pgdat = lruvec_pgdat(lruvec);
 	struct zone_reclaim_stat *reclaim_stat = &lruvec->reclaim_stat;
-	bool stalled = false;
+	int safe = 0;
 
-	while (unlikely(too_many_isolated(pgdat, file, sc, stalled))) {
-		if (stalled)
-			return 0;
+	if (!inactive_reclaimable_pages(lruvec, sc, lru))
+		return 0;
 
-		/* wait a bit for the reclaimer. */
-		msleep(100);
-		stalled = true;
+	while (unlikely(too_many_isolated(pgdat, file, sc, safe))) {
+		congestion_wait(BLK_RW_ASYNC, msecs_to_jiffies(100));
 
 		/* We are about to die and free our memory. Return now. */
 		if (fatal_signal_pending(current))
@@ -2027,8 +2025,13 @@ shrink_inactive_list(unsigned long nr_to_scan, struct lruvec *lruvec,
 		 * that pages are cycling through the LRU faster than
 		 * they are written so also forcibly stall.
 		 */
+<<<<<<< HEAD
 		if (stat.nr_immediate && current_may_throttle())
 			congestion_wait(BLK_RW_ASYNC, HZ/10);
+=======
+		if (nr_immediate && current_may_throttle())
+			congestion_wait(BLK_RW_ASYNC, msecs_to_jiffies(100));
+>>>>>>> db33bc32bd01 (mm: Fix direct references to HZ)
 	}
 
 	/*
@@ -2038,7 +2041,7 @@ shrink_inactive_list(unsigned long nr_to_scan, struct lruvec *lruvec,
 	 */
 	if (!sc->hibernation_mode && !current_is_kswapd() &&
 	    current_may_throttle())
-		wait_iff_congested(pgdat, BLK_RW_ASYNC, HZ/10);
+		wait_iff_congested(pgdat, BLK_RW_ASYNC, msecs_to_jiffies(100));
 
 	trace_mm_vmscan_lru_shrink_inactive(pgdat->node_id,
 			nr_scanned, nr_reclaimed,
@@ -5618,7 +5621,11 @@ static bool throttle_direct_reclaim(gfp_t gfp_mask, struct zonelist *zonelist,
 	 */
 	if (!(gfp_mask & __GFP_FS)) {
 		wait_event_interruptible_timeout(pgdat->pfmemalloc_wait,
+<<<<<<< HEAD
 			allow_direct_reclaim(pgdat, true), HZ);
+=======
+			allow_direct_reclaim(pgdat), msecs_to_jiffies(1000));
+>>>>>>> db33bc32bd01 (mm: Fix direct references to HZ)
 
 		goto check_pending;
 	}
