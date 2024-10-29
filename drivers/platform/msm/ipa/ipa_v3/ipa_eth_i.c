@@ -253,11 +253,12 @@ static int ipa_eth_setup_rtk_gsi_channel(
 	/* setup channel ring */
 	memset(&gsi_channel_props, 0, sizeof(gsi_channel_props));
 	gsi_channel_props.prot = GSI_CHAN_PROT_RTK;
-	if (pipe->dir == IPA_ETH_PIPE_DIR_TX)
+	if (pipe->dir == IPA_ETH_PIPE_DIR_TX) {
 		gsi_channel_props.dir = GSI_CHAN_DIR_FROM_GSI;
-	else
+	} else {
 		gsi_channel_props.dir = GSI_CHAN_DIR_TO_GSI;
 		gsi_ep_info = ipa3_get_gsi_ep_info(ep->client);
+	}
 	if (!gsi_ep_info) {
 		IPAERR("Failed getting GSI EP info for client=%d\n",
 		       ep->client);
