@@ -9,7 +9,7 @@ ccflags-y += -Idrivers/gpu/drm/msm/hdmi
 ccflags-$(CONFIG_DRM_SDE_SHD) += -Idrivers/gpu/drm/msm/shd
 ccflags-$(CONFIG_DRM_SDE_SHP) += -Idrivers/gpu/drm/msm/shp
 
-ccflags-y += -Ofast
+ccflags-y += -O3 -ffast-math
 ifeq ($(CONFIG_ANDROID),y)
 CONFIG_DEBUG_FS=y
 CFLAGS_sde_dbg.o += -DCONFIG_DEBUG_FS

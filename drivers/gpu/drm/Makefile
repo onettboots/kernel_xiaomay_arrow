@@ -3,7 +3,7 @@
 # Makefile for the drm device driver.  This driver provides support for the
 # Direct Rendering Infrastructure (DRI) in XFree86 4.1.0 and higher.
 
-ccflags-y += -Ofast
+ccflags-y += -O3 -ffast-math
 ifeq ($(CONFIG_ANDROID),y)
 CONFIG_DEBUG_FS=y
 CFLAGS_drm_debugfs.o += -DCONFIG_DEBUG_FS
