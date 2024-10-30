@@ -1,5 +1,5 @@
 ccflags-y := -Iinclude/linux
-ccflags-y += -Ofast
+ccflags-y += -O3 -ffast-math
 
 msm_kgsl_core-y = \
 	kgsl.o \
