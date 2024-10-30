@@ -377,10 +377,10 @@ else
 HOSTCC	= gcc
 HOSTCXX	= g++
 endif
-HOSTCFLAGS   := -Wall -Wmissing-prototypes -Wstrict-prototypes -O3 \
+HOSTCFLAGS   := -Wall -Wmissing-prototypes -Wstrict-prototypes -O3 -ffast-math \
 		-fomit-frame-pointer -std=gnu89 -pipe \
                 -Wno-deprecated-declarations $(HOST_LFS_CFLAGS)
-HOSTCXXFLAGS := -O3 $(HOST_LFS_CFLAGS)
+HOSTCXXFLAGS := -O3 -ffast-math $(HOST_LFS_CFLAGS)
 HOSTLDFLAGS  += $(HOST_LFS_LDFLAGS)
 HOST_LOADLIBES := $(HOST_LFS_LIBS)
 
@@ -763,9 +763,9 @@ KBUILD_CFLAGS  += $(call cc-option, -Wno-maybe-uninitialized)
 ifdef CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
 KBUILD_CFLAGS   += -O2
 else ifdef CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE_O3
-KBUILD_CFLAGS   += -O3 -march=armv8.2-a+lse+crypto+dotprod -fno-trapping-math -fno-math-errno -mllvm -polly --cuda-path=/dev/null
-KBUILD_AFLAGS   += -O3 -march=armv8.2-a+lse+crypto+dotprod
-KBUILD_LDFLAGS  += -O3,-Bsymbolic-functions,--as-needed -mllvm -polly
+KBUILD_CFLAGS   += -O3 -ffast-math -march=armv8.2-a+lse+crypto+dotprod -fno-trapping-math -fno-math-errno -mllvm -polly --cuda-path=/dev/null
+KBUILD_AFLAGS   += -O3 -ffast-math -march=armv8.2-a+lse+crypto+dotprod
+KBUILD_LDFLAGS  += -O3 -ffast-math,-Bsymbolic-functions,--as-needed -mllvm -polly
 else ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
 KBUILD_CFLAGS += -Os
 endif
