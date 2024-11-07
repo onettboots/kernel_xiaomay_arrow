@@ -99,6 +99,10 @@ function make_zip {
 function upload()
 {
 curl bashupload.com -T $ZIP_NAME*.zip
+ziped=$ZIP_MOVE/`echo $ZIP_NAME`.zip
+sed -i "4i\FILE_PATH=$ziped" $HOME/bool/upl.sh
+BUILDDATE=`date +"%Y-%m-%d"`
+sed -i '5i\CAPTION="Build Date: '$BUILDDATE' | Type: KSU, DSP, Mi-Thermal, no OCD"' $HOME/bool/upl.sh
 }
 
 DATE_START=$(date +"%s")
