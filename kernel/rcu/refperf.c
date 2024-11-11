@@ -66,8 +66,8 @@ torture_param(long, loops, 10000, "Number of loops per experiment.");
 torture_param(int, nreaders, -1, "Number of readers, -1 for 75% of CPUs.");
 // Number of runs.
 torture_param(int, nruns, 30, "Number of experiments to run.");
-// Reader delay in nanoseconds, 0 for no delay.
-torture_param(int, readdelay, 0, "Read-side delay in nanoseconds.");
+// Reader delay in microseconds, 0 for no delay.
+torture_param(int, readdelay, 0, "Read-side delay in microseconds.");
 
 #ifdef MODULE
 # define REFPERF_SHUTDOWN 0
@@ -111,19 +111,11 @@ struct ref_perf_ops {
 	void (*init)(void);
 	void (*cleanup)(void);
 	void (*readsection)(const int nloops);
-	void (*delaysection)(const int nloops, const int udl, const int ndl);
+	void (*delaysection)(const int nloops, const int ndelay);
 	const char *name;
 };
 
 static struct ref_perf_ops *cur_ops;
-
-static void un_delay(const int udl, const int ndl)
-{
-	if (udl)
-		udelay(udl);
-	if (ndl)
-		ndelay(ndl);
-}
 
 static void ref_rcu_read_section(const int nloops)
 {
@@ -135,13 +127,13 @@ static void ref_rcu_read_section(const int nloops)
 	}
 }
 
-static void ref_rcu_delay_section(const int nloops, const int udl, const int ndl)
+static void ref_rcu_delay_section(const int nloops, const int ndelay)
 {
 	int i;
 
 	for (i = nloops; i >= 0; i--) {
 		rcu_read_lock();
-		un_delay(udl, ndl);
+		udelay(ndelay);
 		rcu_read_unlock();
 	}
 }
@@ -173,14 +165,14 @@ static void srcu_ref_perf_read_section(const int nloops)
 	}
 }
 
-static void srcu_ref_perf_delay_section(const int nloops, const int udl, const int ndl)
+static void srcu_ref_perf_delay_section(const int nloops, const int ndelay)
 {
 	int i;
 	int idx;
 
 	for (i = nloops; i >= 0; i--) {
 		idx = srcu_read_lock(srcu_ctlp);
-		un_delay(udl, ndl);
+		udelay(ndelay);
 		srcu_read_unlock(srcu_ctlp, idx);
 	}
 }
@@ -205,13 +197,13 @@ static void ref_refcnt_section(const int nloops)
 	}
 }
 
-static void ref_refcnt_delay_section(const int nloops, const int udl, const int ndl)
+static void ref_refcnt_delay_section(const int nloops, const int ndelay)
 {
 	int i;
 
 	for (i = nloops; i >= 0; i--) {
 		atomic_inc(&refcnt);
-		un_delay(udl, ndl);
+		udelay(ndelay);
 		atomic_dec(&refcnt);
 	}
 }
@@ -241,13 +233,13 @@ static void ref_rwlock_section(const int nloops)
 	}
 }
 
-static void ref_rwlock_delay_section(const int nloops, const int udl, const int ndl)
+static void ref_rwlock_delay_section(const int nloops, const int ndelay)
 {
 	int i;
 
 	for (i = nloops; i >= 0; i--) {
 		read_lock(&test_rwlock);
-		un_delay(udl, ndl);
+		udelay(ndelay);
 		read_unlock(&test_rwlock);
 	}
 }
@@ -277,13 +269,13 @@ static void ref_rwsem_section(const int nloops)
 	}
 }
 
-static void ref_rwsem_delay_section(const int nloops, const int udl, const int ndl)
+static void ref_rwsem_delay_section(const int nloops, const int ndelay)
 {
 	int i;
 
 	for (i = nloops; i >= 0; i--) {
 		down_read(&test_rwsem);
-		un_delay(udl, ndl);
+		udelay(ndelay);
 		up_read(&test_rwsem);
 	}
 }
@@ -300,7 +292,7 @@ static void rcu_perf_one_reader(void)
 	if (readdelay <= 0)
 		cur_ops->readsection(loops);
 	else
-		cur_ops->delaysection(loops, readdelay / 1000, readdelay % 1000);
+		cur_ops->delaysection(loops, readdelay);
 }
 
 // Reader kthread.  Repeatedly does empty RCU read-side
