@@ -415,7 +415,7 @@ static int main_func(void *arg)
 
 	buf[0] = 0;
 	strcat(buf, "\n");
-	strcat(buf, "Runs\tTime(ns)\n");
+	strcat(buf, "Threads\tTime(ns)\n");
 
 	for (exp = 0; exp < nruns; exp++) {
 		if (errexit)
