@@ -478,7 +478,7 @@ static int main_func(void *arg)
 		if (torture_must_stop())
 			goto end;
 
-		result_avg[exp] = div_u64(1000 * process_durations(nreaders), nreaders * loops);
+		result_avg[exp] = 1000 * process_durations(nreaders) / (nreaders * loops);
 	}
 
 	// Print the average of all experiments
@@ -489,13 +489,9 @@ static int main_func(void *arg)
 	strcat(buf, "Runs\tTime(ns)\n");
 
 	for (exp = 0; exp < nruns; exp++) {
-		u64 avg;
-		u32 rem;
-
 		if (errexit)
 			break;
-		avg = div_u64_rem(result_avg[exp], 1000, &rem);
-		sprintf(buf1, "%d\t%llu.%03u\n", exp + 1, avg, rem);
+		sprintf(buf1, "%d\t%llu.%03d\n", exp + 1, result_avg[exp] / 1000, (int)(result_avg[exp] % 1000));
 		strcat(buf, buf1);
 	}
 
