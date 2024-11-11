@@ -2795,24 +2795,6 @@ bool smblib_support_liquid_feature(struct smb_charger *chg)
 	return chg->support_liquid;
 }
 
-int smblib_get_prop_battery_charging_enabled(struct smb_charger *chg,
-					     union power_supply_propval *val)
-{
-	int rc;
-	u8 reg;
-
-	rc = smblib_read(chg, CHARGING_ENABLE_CMD_REG, &reg);
-	if (rc < 0) {
-		smblib_err(chg,
-			"Couldn't read battery CHARGING_ENABLE_CMD rc=%d\n", rc);
-		return rc;
-	}
-
-	reg = reg & CHARGING_ENABLE_CMD_BIT;
-	val->intval = (reg == CHARGING_ENABLE_CMD_BIT);
-	return 0;
-}
-
 /***********************
  * BATTERY PSY SETTERS *
  ***********************/
