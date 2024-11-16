@@ -1917,16 +1917,13 @@ int zs_page_migrate(struct address_space *mapping, struct page *newpage,
 {
 	struct zs_pool *pool;
 	struct size_class *class;
-	int class_idx;
-	enum fullness_group fullness;
 	struct zspage *zspage;
 	struct page *dummy;
 	void *s_addr, *d_addr, *addr;
 	int offset;
-	unsigned long handle, head;
+	unsigned long handle;
 	unsigned long old_obj, new_obj;
 	unsigned int obj_idx;
-	int ret = -EAGAIN;
 
 	/*
 	 * We cannot support the _NO_COPY case here, because copy needs to
@@ -1953,13 +1950,8 @@ int zs_page_migrate(struct address_space *mapping, struct page *newpage,
 	 * the class lock protects zpage alloc/free in the zspage.
 	 */
 	spin_lock(&class->lock);
-	if (!get_zspage_inuse(zspage)) {
-		/*
-		 * Set "offset" to end of the page so that every loops
-		 * skips unnecessary object scanning.
-		 */
-		offset = PAGE_SIZE;
-	}
+	/* the migrate_write_lock protects zpage access via zs_map_object */
+	migrate_write_lock(zspage);
 
 	offset = get_first_obj_offset(page);
 	s_addr = kmap_atomic(page);
@@ -2003,23 +1995,7 @@ int zs_page_migrate(struct address_space *mapping, struct page *newpage,
 	reset_page(page);
 	put_page(page);
 
-	ret = MIGRATEPAGE_SUCCESS;
-unpin_objects:
-	for (addr = s_addr + offset; addr < s_addr + pos;
-						addr += class->size) {
-		head = obj_to_head(page, addr);
-		if (head & OBJ_ALLOCATED_TAG) {
-			handle = head & ~OBJ_ALLOCATED_TAG;
-			if (!testpin_tag(handle))
-				BUG();
-			unpin_tag(handle);
-		}
-	}
-	kunmap_atomic(s_addr);
-	spin_unlock(&class->lock);
-	migrate_write_unlock(zspage);
-
-	return ret;
+	return MIGRATEPAGE_SUCCESS;
 }
 
 void zs_page_putback(struct page *page)
