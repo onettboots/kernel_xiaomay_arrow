@@ -2025,8 +2025,13 @@ shrink_inactive_list(unsigned long nr_to_scan, struct lruvec *lruvec,
 		 * that pages are cycling through the LRU faster than
 		 * they are written so also forcibly stall.
 		 */
+<<<<<<< HEAD
+		if (stat.nr_immediate && current_may_throttle())
+			congestion_wait(BLK_RW_ASYNC, HZ/10);
+=======
 		if (nr_immediate && current_may_throttle())
 			congestion_wait(BLK_RW_ASYNC, msecs_to_jiffies(100));
+>>>>>>> db33bc32bd01 (mm: Fix direct references to HZ)
 	}
 
 	/*
@@ -5616,7 +5621,11 @@ static bool throttle_direct_reclaim(gfp_t gfp_mask, struct zonelist *zonelist,
 	 */
 	if (!(gfp_mask & __GFP_FS)) {
 		wait_event_interruptible_timeout(pgdat->pfmemalloc_wait,
+<<<<<<< HEAD
+			allow_direct_reclaim(pgdat, true), HZ);
+=======
 			allow_direct_reclaim(pgdat), msecs_to_jiffies(1000));
+>>>>>>> db33bc32bd01 (mm: Fix direct references to HZ)
 
 		goto check_pending;
 	}
@@ -5874,7 +5883,7 @@ static bool kswapd_shrink_node(pg_data_t *pgdat,
 {
 	struct zone *zone;
 	int z;
-	
+
 	if (sc->order) {
 		int ret;
 
