@@ -1379,7 +1379,7 @@ again:
 		}
 
 		ptent = *pte;
-		if (pte_none(ptent)) {
+		if (pte_none(ptent))
 			continue;
 
 		if (need_resched())
