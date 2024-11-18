@@ -60,7 +60,6 @@ function parse_parameters()
 	BUILD_CLEAN=false
 	BUILD_LTO=true
 	BUILD_FULL_LTO=false
-	BUILD_KSU=false
 	# Use verbose for bug fixing
 	VERBOSE=true
 	RELEASE=false
@@ -100,10 +99,6 @@ function parse_parameters()
 			CUSTOM_NAME="-$2"
 			shift 2
 			;;
-                --ksu)
-                        BUILD_KSU=true
-                        shift 1
-                        ;;
 		*)
 			screen "Invalid parameter ${key} specified!"
 			;;
@@ -202,18 +197,6 @@ function make_image()
 		print "${YEL}EROFS ${CYN}enabled"
 	fi
 
-        if [ ${BUILD_KSU} == true ]; then
-                print ${LGR} "${CYN}Enabling ${YEL}KernelSU"
-                ENABLE_CONF+=" CONFIG_KSU"
-
-                CUR_KERNEL_NAME=$(grep CONFIG_LOCALVERSION= arch/arm64/configs/raphael_defconfig)
-                CUR_KERNEL_NAME="${CUR_KERNEL_NAME//*=/}"
-                CUR_KERNEL_NAME="${CUR_KERNEL_NAME//[-'"']/}"
-		CUR_KERNEL_NAME="-${CUR_KERNEL_NAME}-KSU"
-
-		./scripts/config --file ${objdir}/.config --set-str CONFIG_LOCALVERSION "${CUR_KERNEL_NAME}"
-	fi
-
 	# enable/disable stuff
 	for i in ${ENABLE_CONF}; do
 		./scripts/config --file ${objdir}/.config -e $i
@@ -293,9 +276,6 @@ function completion()
 			add_to_banner " Dynamic Partitions"
 		else
 			add_to_banner " Stock Partitions"
-		fi
-		if [[ $(grep CONFIG_KSU= ${objdir}/.config) == CONFIG_KSU=y ]]; then
-			add_to_banner " KernelSU"
 		fi
 		add_to_banner "--------------------------------------"
 
