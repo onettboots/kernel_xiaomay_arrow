@@ -110,6 +110,7 @@ static bool sugov_should_update_freq(struct sugov_policy *sg_policy, u64 time)
 		return false;
 
 	if (unlikely(sg_policy->need_freq_update)) {
+		sg_policy->need_freq_update = cpufreq_driver_test_flags(CPUFREQ_NEED_UPDATE_LIMITS);
 		return true;
 	}
 
@@ -205,7 +206,7 @@ static void sugov_update_commit(struct sugov_policy *sg_policy, u64 time,
 	struct cpufreq_policy *policy = sg_policy->policy;
 
 	if (sg_policy->need_freq_update)
-                sg_policy->need_freq_update = cpufreq_driver_test_flags(CPUFREQ_NEED_UPDATE_LIMITS);
+                sg_policy->need_freq_update = false;
         else if (sg_policy->next_freq == next_freq)
                 return false;
 
