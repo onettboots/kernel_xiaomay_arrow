@@ -3028,24 +3028,6 @@ struct related_thread_group *task_related_thread_group(struct task_struct *p)
 	return rcu_dereference(p->grp);
 }
 
-/* applying the task threshold for all types of low latency tasks. */
-static inline bool walt_low_latency_task(struct task_struct *p)
-{
-	return rcu_dereference(p->grp);
-}
-
-static inline bool walt_binder_low_latency_task(struct task_struct *p)
-{
-	return (p->low_latency & WALT_LOW_LATENCY_BINDER) &&
-		(task_util(p) < sysctl_walt_low_latency_task_threshold);
-}
-
-static inline bool walt_procfs_low_latency_task(struct task_struct *p)
-{
-	return (p->low_latency & WALT_LOW_LATENCY_PROCFS) &&
-		(task_util(p) < sysctl_walt_low_latency_task_threshold);
-}
-
 /* Is frequency of two cpus synchronized with each other? */
 static inline int same_freq_domain(int src_cpu, int dst_cpu)
 {
