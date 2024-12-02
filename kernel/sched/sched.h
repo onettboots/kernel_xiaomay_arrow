@@ -3017,6 +3017,9 @@ static inline bool task_in_related_thread_group(struct task_struct *p)
 
 static inline
 struct related_thread_group *task_related_thread_group(struct task_struct *p)
+{
+	return rcu_dereference(p->grp);
+}
 
 /* Is frequency of two cpus synchronized with each other? */
 static inline int same_freq_domain(int src_cpu, int dst_cpu)
