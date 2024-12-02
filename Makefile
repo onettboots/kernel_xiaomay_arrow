@@ -736,6 +736,9 @@ LLVM_AR		:= llvm-ar
 LLVM_NM		:= llvm-nm
 export LLVM_AR LLVM_NM
 
+KBUILD_LDFLAGS += -O3 --lto-O3
+LDFLAGS += -O3 --lto-O3
+
 # Set O3 optimization level for LTO
 LDFLAGS		+= --plugin-opt=O3
 LDFLAGS		+= --plugin-opt=-import-instr-limit=40
@@ -780,6 +783,8 @@ KBUILD_CFLAGS   += -ffp-contract=fast
 #Enable hot cold split optimization
 KBUILD_CFLAGS   += -mllvm -hot-cold-split=true
 KBUILD_CFLAGS	+= -march=armv8.2-a+lse+fp16+dotprod -mcpu=cortex-a76+crypto+crc
+KBUILD_AFLAGS   += -O3 -march=armv8.2-a+crypto+fp16
+KBUILD_LDFLAGS  += -O3
 endif
 
 # Tell compiler to use pipes instead of temporary files during compilation
