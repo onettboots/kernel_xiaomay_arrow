@@ -1208,8 +1208,6 @@ static int override_version(struct new_utsname __user *name)
 #endif
 }
 
-
-static uint64_t netbpfload_pid = 0;
 SYSCALL_DEFINE1(newuname, struct new_utsname __user *, name)
 {
 	struct new_utsname tmp;
