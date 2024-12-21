@@ -1372,6 +1372,9 @@ struct task_struct {
 	/* Timestamp for last schedule: */
 	unsigned long long		ftrace_timestamp;
 
+#ifdef CONFIG_KSU_SUSFS
+	u64 android_kabi_reserved8;
+#endif
 	/*
 	 * Number of functions that haven't been traced
 	 * because of depth overrun:
