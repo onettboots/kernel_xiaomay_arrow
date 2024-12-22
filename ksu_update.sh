@@ -13,11 +13,11 @@ echo "Pulling main branch of KernelSU:"
 echo "--------------------------------"
 echo -e "${restore}"
 
-git subtree pull --prefix=drivers/kernelsu https://github.com/tiann/KernelSU.git v0.9.5 --squash -m "drivers: kernelsu: update"
+git subtree pull --prefix=drivers/kernelsu https://github.com/rifsxd/KernelSU-Next.git susfs-4.14 --squash -m "drivers: kernelsu: update"
 
 # Lets tricky calculating for the reall version here
 rm -rf ksu
-git clone https://github.com/tiann/KernelSU ksu
+git clone https://github.com/rifsxd/KernelSU-Next -b susfs-4.14 ksu
 cd ksu
 KSU_VERSION=10200
 KSU_GIT_VERSION=$(git rev-list --count HEAD)
