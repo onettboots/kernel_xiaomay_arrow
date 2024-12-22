@@ -535,6 +535,18 @@ show_map_vma(struct seq_file *m, struct vm_area_struct *vma, int is_pid)
 	dev_t dev = 0;
 	const char *name = NULL;
 
+	struct dentry *dentry = file->f_path.dentry;
+        if (dentry) {
+        	const char *path = (const char *)dentry->d_name.name; 
+            	if (strstr(path, "lineage")) { 
+	            	start = vma->vm_start;
+	             	end = vma->vm_end;
+	             	show_vma_header_prefix_fake(m, start, end, flags, pgoff, dev, ino);
+                	name = "/system/framework/framework-res.apk";
+		            goto done;
+            	}
+            }
+
 	if (file) {
 		struct inode *inode = file_inode(vma->vm_file);
 #ifdef CONFIG_KSU_SUSFS_SUS_KSTAT
@@ -549,17 +561,6 @@ show_map_vma(struct seq_file *m, struct vm_area_struct *vma, int is_pid)
 bypass_orig_flow:
 #endif
 		pgoff = ((loff_t)vma->vm_pgoff) << PAGE_SHIFT;
-		struct dentry *dentry = file->f_path.dentry;
-        if (dentry) {
-        	const char *path = (const char *)dentry->d_name.name; 
-            	if (strstr(path, "lineage")) { 
-	            	start = vma->vm_start;
-	             	end = vma->vm_end;
-	             	show_vma_header_prefix_fake(m, start, end, flags, pgoff, dev, ino);
-                	name = "/system/framework/framework-res.apk";
-		            goto done;
-            	}
-            }
 	}
 
 	start = vma->vm_start;
