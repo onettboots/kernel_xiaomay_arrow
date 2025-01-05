@@ -204,8 +204,10 @@ static void sugov_update_commit(struct sugov_policy *sg_policy, u64 time,
 {
 	struct cpufreq_policy *policy = sg_policy->policy;
 
-	if (sg_policy->next_freq == next_freq &&
-	    !cpufreq_driver_test_flags(CPUFREQ_NEED_UPDATE_LIMITS))
+	if (sg_policy->next_freq == next_freq)
+		return;
+
+	if (sugov_up_down_rate_limit(sg_policy, time, next_freq))
 		return;
 
 	sg_policy->next_freq = next_freq;
@@ -258,8 +260,7 @@ static unsigned int get_next_freq(struct sugov_policy *sg_policy,
 
 	freq = (freq + (freq >> 2)) * util / max;
 
-	if (freq == sg_policy->cached_raw_freq && !sg_policy->need_freq_update &&
-	    !cpufreq_driver_test_flags(CPUFREQ_NEED_UPDATE_LIMITS))
+	if (freq == sg_policy->cached_raw_freq && !sg_policy->need_freq_update)
 		return sg_policy->next_freq;
 
 	sg_policy->need_freq_update = false;
