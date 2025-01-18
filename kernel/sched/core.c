@@ -787,7 +787,7 @@ unsigned int sysctl_sched_uclamp_util_max = SCHED_CAPACITY_SCALE;
  * This knob will not override the system default sched_util_clamp_min defined
  * above.
  */
-unsigned int sysctl_sched_uclamp_util_min_rt_default = SCHED_CAPACITY_SCALE;
+unsigned int sysctl_sched_uclamp_util_min_rt_default = 0;
 
 /* All clamps are required to be less or equal than these values */
 static struct uclamp_se uclamp_default[UCLAMP_CNT];
@@ -968,7 +968,7 @@ uclamp_tg_restrict(struct task_struct *p, enum uclamp_id clamp_id)
 		return uc_req;
 
 	//battery kprofile optimization
-        if (kp_active_mode() != 3) {
+        if (kp_active_mode() == 1) {
                 tg_min = 0;
         } else {
                 //Run for clamp boosting
@@ -8571,7 +8571,6 @@ struct uclamp_param {
 	char uclamp_min[3];
 	char uclamp_max[3];
 	u64  uclamp_latency_sensitive;
-	u64  uclamp_boosted;
 	u64  cpu_shares;
 };
 
@@ -8585,15 +8584,15 @@ static void uclamp_set(struct cgroup_subsys_state *css)
 	int i;
 
 	static struct uclamp_param tgts[] = {
-		{"top-app",             "20", "max",  1, 1, 20480},
-		{"rt",			"0",  "max",  1, 0, 20480},
-		{"nnapi-hal",		"0",  "max",  1, 0, 20480},
-       		{"foreground",          "0",  "max",  1, 0, 20480},
-                {"camera-daemon",       "10", "max",  1, 0, 20480},
-                {"system",              "0",  "max",  0, 0, 20480},
-                {"dex2oat",             "0",  "60",   0, 0,   512},
-        	{"background",          "0",  "50",   0, 0,  1024},
-        	{"system-background",   "0",  "50",   0, 0,  1024},
+		{"top-app",             "20", "max",  1, 20480},
+		{"rt",			"0",  "max",  1, 20480},
+		{"nnapi-hal",		"0",  "max",  1, 20480},
+       		{"foreground",          "0",  "max",  1, 20480},
+                {"camera-daemon",       "10", "max",  1, 20480},
+                {"system",              "0",  "max",  0, 20480},
+                {"dex2oat",             "0",  "60",   0,   512},
+        	{"background",          "0",  "50",   0,  1024},
+        	{"system-background",   "0",  "50",   0,  1024},
 	};
 
         if(!css->cgroup->kn)
@@ -8609,8 +8608,7 @@ static void uclamp_set(struct cgroup_subsys_state *css)
 						UCLAMP_MAX);
 			cpu_uclamp_ls_write_u64(css, NULL,
 						tgt.uclamp_latency_sensitive);
-			cpu_uclamp_boost_write_u64(css, NULL,
-				tgt.uclamp_boosted);
+
 #ifdef CONFIG_FAIR_GROUP_SCHED
 			cpu_shares_write_u64(css, NULL, tgt.cpu_shares);
 #endif
