@@ -1116,7 +1116,7 @@ vfs_kern_mount(struct file_system_type *type, int flags, const char *name, void 
 #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
 	if (susfs_is_current_zygote_domain()) {
 		mnt->mnt.android_kabi_reserved4 = mnt->mnt_id;
-		//mnt->mnt_id = current->android_kabi_reserved8++;
+		mnt->mnt_id = current->android_kabi_reserved8++;
 	}
 #endif
 
@@ -1205,7 +1205,7 @@ static struct mount *clone_mnt(struct mount *old, struct dentry *root,
 #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
 	if (susfs_is_current_zygote_domain() && !(flag & CL_SUSFS_COPY_MNT_NS)) {
 		mnt->mnt.android_kabi_reserved4 = mnt->mnt_id;
-		//mnt->mnt_id = current->android_kabi_reserved8++;
+		mnt->mnt_id = current->android_kabi_reserved8++;
 	}
 #endif
 
@@ -3271,7 +3271,7 @@ struct mnt_namespace *copy_mnt_ns(unsigned long flags, struct mnt_namespace *ns,
 	// Assign the 'last_entry_mnt_id' to 'current->android_kabi_reserved8' for later use.
 	// should be fine here assuming zygote is forking/unsharing app in one single thread.
 	// Or should we put a lock here?
-	//current->android_kabi_reserved8 = last_entry_mnt_id;
+	current->android_kabi_reserved8 = last_entry_mnt_id;
 #endif
 
 	namespace_unlock();
