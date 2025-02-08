@@ -365,7 +365,7 @@ fn _install_module(zip: &str) -> Result<()> {
     );
 
     let sparse_image_size = 1 << 34; // 16GB
-    let journal_size = 8; // 8M
+    let journal_size = 64; // 64MB
     if !modules_img_exist && !modules_update_img_exist {
         // if no modules and modules_update, it is brand new installation, we should create a new img
         // create a tmp module img and mount it to modules_update
