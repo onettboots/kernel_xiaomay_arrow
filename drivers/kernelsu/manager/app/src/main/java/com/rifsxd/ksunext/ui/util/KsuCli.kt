@@ -342,7 +342,7 @@ fun reboot(reason: String = "") {
     val shell = getRootShell()
     if (reason == "recovery") {
         // KEYCODE_POWER = 26, hide incorrect "Factory data reset" message
-        ShellUtils.fastCmd(shell, "/system/bin/input keyevent 26")
+        ShellUtils.fastCmd(shell, "/system/bin/reboot $reason")
     }
     ShellUtils.fastCmd(shell, "/system/bin/svc power reboot $reason || /system/bin/reboot $reason")
 }
